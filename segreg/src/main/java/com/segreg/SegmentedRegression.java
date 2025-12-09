@@ -96,6 +96,11 @@ public class SegmentedRegression {
         }
     }
 
+    public void ComputeLinearRegression(double[] data_x, double[] data_y, double idx_range_in, double lr_params_out, double err_range_in ){
+        // TODO: Implement linear regression computation
+
+    }
+
     public boolean CanSplitSegment(int[] segment,  ) {
         // Placeholder logic for determining if a segment can be split
         return (endIndex - startIndex) > 2; // Example condition
