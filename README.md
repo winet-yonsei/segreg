@@ -24,12 +24,11 @@
 
 ## 중요 함수
 * SegmentedRegression segReg = new SegmentedRegression(x_data, y_data);
-** 데이터를 입력받아 세그먼티드 회귀 분석기 객체를 생성한다. 이때 x_data와 y_data는 double 배열이다.
+    * 데이터를 입력받아 세그먼티드 회귀 분석기 객체를 생성한다. 이때 x_data와 y_data는 double 배열이다.
 * segReg.sortData();
-** 입력된 데이터를 x 좌표 기준으로 정렬한다.
+    * 입력된 데이터를 x 좌표 기준으로 정렬한다.
 * Deque<Segment> segments = segReg.performRegression(maxSegments, maxError);
-** 세그먼티드 회귀 분석을 수행한다. maxSegments는 최대 세그먼트 개수, maxError는 세그먼트별 최대 허용 오차이다.
-    반환값은 세그먼트들의 덱(Deque)이다.
-** 반환값인 segment는 Segment 클래스 객체로, 각 세그먼트의 시작 인덱스, 끝 인덱스, 회귀 분석 결과를 포함한다.
-*** 회귀 분석 결과는 SimpleRegression regression = seg.regression; 형태로 접근할 수 있다.
-*** main.java에서 57번째 줄의 regression.predict(sorted_x[i]) 형태로 예측값을 얻는 예시를 참고할 수 있다.
+    * 세그먼티드 회귀 분석을 수행한다. maxSegments는 최대 세그먼트 개수, maxError는 세그먼트별 최대 허용 오차이다. 반환값은 세그먼트들의 덱(Deque)이다.
+    * 반환값인 segment는 Segment 클래스 객체로, 각 세그먼트의 시작 인덱스, 끝 인덱스, 회귀 분석 결과를 포함한다.
+        * 회귀 분석 결과는 SimpleRegression regression = seg.regression; 형태로 접근할 수 있다.
+        * main.java에서 57번째 줄의 regression.predict(sorted_x[i]) 형태로 예측값을 얻는 예시를 참고할 수 있다.
