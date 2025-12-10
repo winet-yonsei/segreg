@@ -4,10 +4,13 @@
 * 참조 코드: https://www.codeproject.com/articles/Segmented-Linear-Regression#comments-section
 * 실행 결과: 
 
-1. error로 filtering된 세그먼트들
-<img src="img/err.png" width="600">
-2. 최대 세그먼트 개수로 filtering된 세그먼트들
-<img src="img/num_seg.png" width="600">
+    1. error로 filtering된 세그먼트들 
+
+    <img src="img/err.png" width="600">
+
+    2. 최대 세그먼트 개수로 filtering된 세그먼트들 
+
+    <img src="img/num_seg.png" width="600">
 
 * 사용 라이브러리
     - Apache Commons Math3
@@ -32,3 +35,20 @@
     * 반환값인 segment는 Segment 클래스 객체로, 각 세그먼트의 시작 인덱스, 끝 인덱스, 회귀 분석 결과를 포함한다.
         * 회귀 분석 결과는 SimpleRegression regression = seg.regression; 형태로 접근할 수 있다.
         * main.java에서 57번째 줄의 regression.predict(sorted_x[i]) 형태로 예측값을 얻는 예시를 참고할 수 있다.
+
+
+## 관련 함수
+* 단순 선형 회귀(simple linear regression, SLR)
+    * 독립 변수가 단 한개일 때 연속형 변수들에 대해 독립 변수와 종속 변수 사이의 상관관계를 나타내는 것
+    * 회귀 직선: $$ y = a + b*x$$
+        * y: 종속 변수
+        * x: 독립 변수
+        * a: y절편 (intercept)
+        * b: 기울기 (slope)
+
+    * 단순 선형 회귀는 실제 관측값 $y_i$과 $a+b*x_i$에 대한 오차가 적게 되는 $a,b$를 찾는 것을 목표로 한다.
+        $$ (\hat{a}, \hat{b}) = \arg\min(Q(a,b))
+        $$ Q(a,b) = \sum_{i=1}^n (y_i - a - bx_i)^2
+        
+    * Apache Commons Math3 라이브러리의 SimpleRegression 클래스를 사용하여 단순 선형 회귀 분석 객체를 생성한다.
+
