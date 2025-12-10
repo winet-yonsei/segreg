@@ -3,13 +3,14 @@ package com.segreg;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.commons.math3.stat.regression.RegressionResults;
 import java.util.Deque;
+import java.util.ArrayDeque;
 import java.util.Vector;
 
 public class SegmentedRegression {
     private double [] xData;
     private double [] yData;
     private SimpleRegression regression;
-    private Deque<int[]> segmentStack;
+    private Deque<Segment> segmentStack;
     private int SMAWindowLen = 10; // 이동 평균 윈도우의 길이
 
     public SegmentedRegression(double[] xData, double[] yData) {
@@ -17,6 +18,7 @@ public class SegmentedRegression {
         this.yData = yData;
 
         this.regression = new SimpleRegression();
+        this.segmentStack = new ArrayDeque<Segment>();
     }
 
     public void clearData() {
@@ -46,16 +48,37 @@ public class SegmentedRegression {
     public void setData(double[] xData, double[] yData) {
         this.xData = xData;
         this.yData = yData;
-    }   
+    }
+
+    public void sortData() {
+        int n = xData.length;
+
+        double[][] pairedData = new double[n][2];
+        for (int i = 0; i < n; i++) {
+            pairedData[i][0] = xData[i];
+            pairedData[i][1] = yData[i];
+        }
+
+        java.util.Arrays.sort(pairedData, new java.util.Comparator<double[]>() {
+            public int compare(double[] a, double[] b) {
+                return Double.compare(a[0], b[0]);
+            }
+        });
+
+        for (int i = 0; i < n; i++) {
+            xData[i] = pairedData[i][0];
+            yData[i] = pairedData[i][1];
+        }
+    }
 
 
-    public RegressionResults[] performRegression(int maxSegments) {
+    public Deque<Segment> performRegression(int maxSegments, double maxError) {
         regression.clear();
         segmentStack.clear();
 
-        int[] range = new int[]{0, xData.length};
+        this.sortData();
 
-        segmentStack.add(range);
+        Segment range = new Segment(xData[0], xData[xData.length - 1], 0, xData.length);
 
         double[] smadata = CalculateSMA(SMAWindowLen);
 
@@ -66,27 +89,116 @@ public class SegmentedRegression {
         }
 
         //  find positions of local maxima in the vector of deviations 
-        Vector<Integer> vec_max_indices = new Vector<Integer>(); 
-        FindLocalMaxima (deviations, vec_max_indices) ; 
-
-        while (!segmentStack.isEmpty() ){
-            int[] currentRange = segmentStack.pop();
-            // Logic to find the best split point and add new segments to the stack
-            // This is a placeholder for the actual segmentation logic
-
-            // TODO: Implement segmentation based on local maxima and maxSegments
+        Vector<Integer> vec_max_indices = FindLocalMaxima (deviations); 
+        Vector<Datapoint> localmax = new Vector<Datapoint>();
+        for (Integer idx : vec_max_indices) {
+            localmax.add(new Datapoint(xData[idx], deviations[idx], idx));
         }
-        for (int i = 0; i < xData.length; i++) {
-            regression.addData(xData[i], yData[i]);
-        }        
-        return new RegressionResults[] { regression.regress() };
+        range.setSegmentLocalMaxima(localmax);
+
+        segmentStack.push(range);
+
+        boolean checked_all = false; // 
+
+        while (!checked_all){            
+            int max_seg_idx = -1;
+            double max_seg_err = -1.;
+            int cur_idx = -1;
+
+            for (Segment seg : segmentStack) {
+                cur_idx += 1;
+                if (!seg.isErr_chk()){ // error값을 계산하지 않았음
+                    int start_idx = seg.getStart_idx();
+                    int end_idx = seg.getEnd_idx();
+
+                    double[] seg_xdata = new double[end_idx - start_idx];
+                    double[] seg_ydata = new double[end_idx - start_idx];
+
+                    System.arraycopy(xData, start_idx, seg_xdata, 0, end_idx - start_idx);
+                    System.arraycopy(yData, start_idx, seg_ydata, 0, end_idx - start_idx);
+
+                    SimpleRegression tempRegression = new SimpleRegression();
+                    for (int i = 0; i < seg_xdata.length; i++) {
+                        tempRegression.addData(seg_xdata[i], seg_ydata[i]);
+                    }
+                    RegressionResults regResults = tempRegression.regress();
+                    seg.SetRegression(tempRegression, regResults);
+
+                    // 최대 오차 계산
+                    maxError = 0.;
+
+                    for (int i = start_idx; i < end_idx; i++) {
+                        double predictedY = tempRegression.predict(xData[i]);
+                        double error = Math.abs(yData[i] - predictedY);
+                        if (error > maxError) {
+                            maxError = error;
+                        } 
+                    }
+
+                    seg.setCurErr(maxError);
+                }
+
+                if (seg.canSplit()){
+                    double seg_err = seg.getCurErr();
+                    if (maxError >= 0.0){ // 오류 한도가 설정된 경우
+                        if (seg_err > max_seg_err) {
+                            max_seg_err = seg_err;
+                            max_seg_idx = cur_idx;
+                        }
+                    }
+                }
+            }
+
+            if (maxSegments > -1 && segmentStack.size() >= maxSegments){
+                // 세그먼트 개수 제한 확인하기
+                checked_all = true;
+                break;
+            }
+
+            if (max_seg_idx > -1){
+                Deque<Segment> newSegments = new ArrayDeque<Segment>();
+                // 좌편 채우기
+                for (int i=0; i<max_seg_idx; i++){
+                    newSegments.add(segmentStack.removeFirst());
+                }
+                Segment split_seg = segmentStack.removeFirst();
+
+                // 세그먼트 나누기
+
+                Segment[] outSegments = new Segment[2];
+                boolean split_success = split_seg.SplitSegmentbyLocalMaxima(outSegments);
+                if (split_success) {
+                    newSegments.add(outSegments[0]);
+                    newSegments.add(outSegments[1]);
+                } else {
+                    newSegments.add(split_seg);
+                }
+
+                // 우변 채우기
+
+
+                int stacklen = segmentStack.size();
+
+                for (int i=0; i<stacklen; i++){
+                    newSegments.add(segmentStack.removeFirst());
+                }
+
+                segmentStack = newSegments;
+            }
+            else{
+                checked_all = true;
+            }            
+        }
+        
+        return segmentStack;
     }
 
-    public void FindLocalMaxima(double[] data, Vector<Integer> vec_max_indices) {
+    public Vector<Integer> FindLocalMaxima(double[] data) {
         int n = data.length;
+        Vector<Integer> vec_max_indices = new Vector<Integer>();
         
         if (n < 3) {
-            return;
+            return vec_max_indices;
         }
         
         for (int i = 1; i < n - 1; i++) {
@@ -94,20 +206,10 @@ public class SegmentedRegression {
                 vec_max_indices.add(i);
             }
         }
+        return vec_max_indices;
     }
 
-    public void ComputeLinearRegression(double[] data_x, double[] data_y, double idx_range_in, double lr_params_out, double err_range_in ){
-        // TODO: Implement linear regression computation
-
-    }
-
-    public boolean CanSplitSegment(int[] segment,  ) {
-        // Placeholder logic for determining if a segment can be split
-        return (endIndex - startIndex) > 2; // Example condition
-        // TODO: Implement actual logic based on regression error or other criteria
-    }
-
-    public double[] CalculateSMA(int half_len){
+    public double[] CalculateSMA(int half_len){  // simple moving average
         int n_values = yData.length;
         double[] result = new double[n_values];
         System.arraycopy(yData, 0, result, 0, n_values);
@@ -118,7 +220,6 @@ public class SegmentedRegression {
         }
 
         else{
-            int ix = 0; 
             double sum_y = 0.0;
 
             sum_y = result[0];
