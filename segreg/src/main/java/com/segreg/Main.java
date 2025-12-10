@@ -42,20 +42,22 @@ public class Main {
         double[] sorted_x = segReg.getXData();
         double[] sorted_y = segReg.getYData();
 
+        int seg_id = -1;
         for (Segment seg : segments) {
+            seg_id += 1;
             double startX = seg.getStartX();
             double endX = seg.getEndX();
             int start_idx = seg.getStart_idx();
             int end_idx = seg.getEnd_idx();
             SimpleRegression regression = seg.regression;
             
-            dataset.addValue(regression.predict(startX), "Regression", Double.toString(startX));
+            
             for (int i=start_idx; i<end_idx; i++){
                 dataset.addValue(sorted_y[i], "Data", Double.toString(sorted_x[i]));
-                dataset.addValue(regression.predict(sorted_x[i]), "Regression", Double.toString(sorted_x[i]));
+                dataset.addValue(regression.predict(sorted_x[i]), "Regression "+seg_id, Double.toString(sorted_x[i]));
             }
-            dataset.addValue(regression.predict(endX), "Regression", Double.toString(endX));
-            
+
+            // 회귀 결과는 regression.predict(sorted_x[i]) 으로 얻을 수 있습니다.
         }
 
         // 예시: Line Chart 생성 (범주형)
