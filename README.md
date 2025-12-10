@@ -3,7 +3,7 @@
 ## 자바로 변환한 세그먼티드 회귀 분석기
 * 참조 코드: https://www.codeproject.com/articles/Segmented-Linear-Regression#comments-section
 * 실행 결과: 
-> 
+
 1. error로 filtering된 세그먼트들
 <img src="img/err.png" width="600">
 2. 최대 세그먼트 개수로 filtering된 세그먼트들
