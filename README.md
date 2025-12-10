@@ -47,16 +47,26 @@
       * $b$: 기울기 (slope)
 
   * 단순 선형 회귀는 실제 관측값 $y_i$과 $a+b*x_i$에 대한 오차가 적게 되는 $a,b$를 찾는 것을 목표로 한다.
-    $$(\hat{a}, \hat{b}) = \arg\min(Q(a,b))$$
-    $$Q(a,b) = \sum_{i=1}^n (y_i - a - bx_i)^2$$
+
+$$(\hat{a}, \hat{b}) = \arg\min(Q(a,b))$$
+
+
+$$Q(a,b) = \sum_{i=1}^n (y_i - a - bx_i)^2$$
 
   * Apache Commons Math3 라이브러리의 SimpleRegression 클래스를 사용하여 단순 선형 회귀 분석 객체를 생성한다.
   
 * 분할 선형 회귀(Segmented Linear Regression) 
   * piecewise regression 또는 broken-stick regression이라고 불리며 데이터를 여러 구간으로 나누어 "부러진 막대기"처럼 각 구간마다 다른 직선을 맞추는 방식으로 독립 변수들이 서로 다른 그룹으로 나뉘어 이들 영역에서 변수 간의 관계가 다르게 나타날 때 유용하다. 이때 다른 구간간의 경계점을 임계점(Breakpoint)라고 한다.
   * 분할 선형 회귀는 하나의 구간에서 임계값을 찾아 두개의 구간으로 분할하는 것을 반복 수행하여 작동한다. 이러한 임계점은 관측값 $y$와 예측값 $y'$간의 차이 제곱의 합(the sum of squares of the differences, SSD)를 최소화 하는 지점으로 다음과 같이 표현된다.
-    $$y_i'=a_1 + b_1 x_i, \text{if~} x_i <BR$$
-    $$y_i'= a_2 + b_2 x_i, \text{if~} x_i \geq BR$$
-    $$BR = \underset{BR}{\arg\min}\{\min_{A,B} \sum_{i=1}^n (y_i -y_i')^2\}$$
-    $$\text{where}, A=\{a_1,a_2\}, \text{and~} B=\{b_1,b_2\}$$
+
+$$y_i'=a_1 + b_1 x_i, \text{if~} x_i < BR$$
+
+    
+$$y_i'= a_2 + b_2 x_i, \text{if~} x_i \geq BR$$
+    
+
+$$BR = \underset{BR}{\arg\min}\{\min_{A,B} \sum_{i=1}^n (y_i -y_i')^2\}$$
+    
+
+$$\text{where}, A=\{a_1,a_2\}, \text{and~} B=\{b_1,b_2\}$$
 
