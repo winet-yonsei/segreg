@@ -40,15 +40,15 @@
 ## 관련 함수
 * 단순 선형 회귀(simple linear regression, SLR)
     * 독립 변수가 단 한개일 때 연속형 변수들에 대해 독립 변수와 종속 변수 사이의 상관관계를 나타내는 것
-    * 회귀 직선: $$ y = a + b*x$$
+    * 회귀 직선: $ y = a + b*x$
         * y: 종속 변수
         * x: 독립 변수
         * a: y절편 (intercept)
         * b: 기울기 (slope)
 
     * 단순 선형 회귀는 실제 관측값 $y_i$과 $a+b*x_i$에 대한 오차가 적게 되는 $a,b$를 찾는 것을 목표로 한다.
-        $$ (\hat{a}, \hat{b}) = \arg\min(Q(a,b))
-        $$ Q(a,b) = \sum_{i=1}^n (y_i - a - bx_i)^2
-        
+        $$ (\hat{a}, \hat{b}) = \arg\min(Q(a,b)) $$
+        $$ Q(a,b) = \sum_{i=1}^n (y_i - a - bx_i)^2 $$
+
     * Apache Commons Math3 라이브러리의 SimpleRegression 클래스를 사용하여 단순 선형 회귀 분석 객체를 생성한다.
 
