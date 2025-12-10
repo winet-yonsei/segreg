@@ -4,10 +4,10 @@
 * 참조 코드: https://www.codeproject.com/articles/Segmented-Linear-Regression#comments-section
 * 실행 결과: 
 > 
-    1. error로 filtering된 세그먼트들
-    <img src="img/err.png" width="600">
-    2. 최대 세그먼트 개수로 filtering된 세그먼트들
-    <img src="img/num_seg.png" width="600">
+1. error로 filtering된 세그먼트들
+<img src="img/err.png" width="600">
+2. 최대 세그먼트 개수로 filtering된 세그먼트들
+<img src="img/num_seg.png" width="600">
 
 * 사용 라이브러리
     - Apache Commons Math3
