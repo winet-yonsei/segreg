@@ -37,7 +37,7 @@
     * main.java에서 57번째 줄의 regression.predict(sorted_x[i]) 형태로 예측값을 얻는 예시를 참고할 수 있다.
 
 
-## 관련 함수
+## 수학적 근거 정리
 * 단순 선형 회귀(Simple Linear Regression, SLR)
   * 독립 변수가 단 한개일 때 연속형 변수들에 대해 독립 변수와 종속 변수 사이의 상관관계를 나타내는 것
     * 회귀 직선: $y = a + bx$
